@@ -5,14 +5,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -34,15 +39,17 @@ import java.util.UUID;
 public class MenuActivity extends AppCompatActivity {
 
     EditText editNome ;
+    EditText editPreco;
+    EditText editQuant;
     ListView listView ;
     ProgressBar progressBar ;
 
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
 
-    private List<Cliente> lisCliente = new ArrayList<Cliente>();
-    private ArrayAdapter<Cliente> arrayAdapterCliente;
-    private Cliente clienteSelec;
+    private ArrayList<Produto> lisProduto = new ArrayList<Produto>();
+    private ArrayAdapter<Produto> arrayAdapterProduto;
+    private Produto produtoSelec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +59,10 @@ public class MenuActivity extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        editNome = findViewById(R.id.editTextNomeUsuario);
-        listView = findViewById(R.id.idListView);
+        editNome = findViewById(R.id.textViewIdNome);
+        editQuant = findViewById(R.id.textViewIdQuant);
+        editPreco = findViewById(R.id.textViewIdPreco);
+        listView = (ListView) findViewById(R.id.idListView);
         progressBar = findViewById(R.id.progressBarReg);
 
 
@@ -67,25 +76,27 @@ public class MenuActivity extends AppCompatActivity {
        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
            @Override
            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-               clienteSelec = (Cliente) adapterView.getItemAtPosition(i);
-               editNome.setText(clienteSelec.getNome());
+               produtoSelec = (Produto) adapterView.getItemAtPosition(i);
+               editNome.setText(produtoSelec.getNome());
+               editPreco.setText(produtoSelec.getPreço());
+               editQuant.setText(produtoSelec.getQuantidade());
            }
        });
 
     }
 
     private void loadData() {
-        databaseReference.child("Clientes").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("Produtos").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                lisCliente.clear();
+                lisProduto.clear();
                 for(DataSnapshot obj : snapshot.getChildren()){
-                    Cliente c = obj.getValue(Cliente.class);
-                    lisCliente.add(c);
+                    Produto p = obj.getValue(Produto.class);
+                    lisProduto.add(p);
                 }
-                Collections.sort(lisCliente);
-                arrayAdapterCliente = new ArrayAdapter<Cliente>(MenuActivity.this,android.R.layout.simple_list_item_1,lisCliente);
-                listView.setAdapter(arrayAdapterCliente);
+                Collections.sort(lisProduto);
+                ProdutoAdapter produtoAdapter = new ProdutoAdapter(MenuActivity.this, lisProduto);
+                listView.setAdapter(produtoAdapter);
                 progressBar.setVisibility(View.GONE);
             }
 
@@ -94,7 +105,6 @@ public class MenuActivity extends AppCompatActivity {
 
             }
         });
-        //elfo putinha
     }
 
     @Override
@@ -107,17 +117,19 @@ public class MenuActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         progressBar = findViewById(R.id.progressBarReg);
         int id = item.getItemId();
-        Cliente c = new Cliente();
+        Produto p = new Produto();
         progressBar.setVisibility(View.VISIBLE);
         switch (id){
             case R.id.menu_inser:
-                c.setId(UUID.randomUUID().toString());
-                c.setNome(editNome.getText().toString());
-                databaseReference.child("Clientes").child(c.getId()).setValue(c).addOnCompleteListener(new OnCompleteListener<Void>() {
+                p.setId(UUID.randomUUID().toString());
+                p.setNome(editNome.getText().toString());
+                p.setPreço(editPreco.getText().toString());
+                p.setQuantidade(editQuant.getText().toString());
+                databaseReference.child("Produtos").child(p.getId()).setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
-                        Toast.makeText(MenuActivity.this, "Cliente Inserido com Sucesso", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MenuActivity.this, "Produto Inserido com Sucesso", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(MenuActivity.this,MenuActivity.class);
                         startActivity(intent);
                         progressBar.setVisibility(View.GONE);
@@ -129,12 +141,12 @@ public class MenuActivity extends AppCompatActivity {
                 });
                 break;
             case R.id.menu_del:
-                c.setId(clienteSelec.getId());
-                databaseReference.child("Clientes").child(c.getId()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                p.setId(produtoSelec.getId());
+                databaseReference.child("Produtos").child(p.getId()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(MenuActivity.this, "Cliente Deletado com Sucesso", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MenuActivity.this, "Produto Deletado com Sucesso", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                         }else{
                             Toast.makeText(MenuActivity.this, "Falha ao deletar o cliente", Toast.LENGTH_SHORT).show();
@@ -144,13 +156,15 @@ public class MenuActivity extends AppCompatActivity {
                 });
                 break;
             case R.id.menu_alter:
-                c.setId(clienteSelec.getId());
-                c.setNome(editNome.getText().toString().trim());
-                databaseReference.child("Clientes").child(c.getId()).setValue(c).addOnCompleteListener(new OnCompleteListener<Void>() {
+                p.setId(produtoSelec.getId());
+                p.setNome(editNome.getText().toString().trim());
+                p.setPreço(editPreco.getText().toString().trim());
+                p.setQuantidade(editQuant.getText().toString().trim());
+                databaseReference.child("Produtos").child(p.getId()).setValue(p).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(MenuActivity.this, "Cliente Alterado com Sucesso", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MenuActivity.this, "Produtos Alterado com Sucesso", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                         }else{
                             Toast.makeText(MenuActivity.this, "Falha ao alterar o cliente", Toast.LENGTH_SHORT).show();

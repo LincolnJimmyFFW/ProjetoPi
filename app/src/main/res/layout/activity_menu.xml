@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MenuActivity">
+    android:layout_marginRight="10dp">
 
     <ProgressBar
         android:id="@+id/progressBarReg"
@@ -18,25 +18,122 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/editTextNomeUsuario"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Nome Usuario"
-            android:inputType="textPersonName" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_corner_menu"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textViewNome"
+                    android:layout_width="51dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:text="Nome:"
+                    android:textAlignment="center"
+                    android:textColor="#F4EBEB" />
+
+                <EditText
+                    android:id="@+id/textViewIdNome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:height="48dp"
+                    android:hint="Nome"
+                    android:textAlignment="center"
+                    android:textColor="#F3EEEE"
+                    android:textColorHint="#FAF6F6" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:text="Quantidade:"
+                    android:textAlignment="center"
+                    android:textColor="#F4F0F0" />
+
+                <EditText
+                    android:id="@+id/textViewIdQuant"
+                    android:layout_width="7dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:height="48dp"
+                    android:hint="32"
+                    android:textAlignment="center"
+                    android:textColor="#F4F0F0"
+                    android:textColorHint="#FAF6F6" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_width="27dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:text="Preço:"
+                    android:textAlignment="center"
+                    android:textColor="#FDFDFD"
+                    android:textColorHint="#F1EAEA" />
+
+                <EditText
+                    android:id="@+id/textViewIdPreco"
+                    android:layout_width="34dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="1"
+                    android:height="48dp"
+                    android:hint="1000.00"
+                    android:textAlignment="center"
+                    android:textColor="#F3EBEB"
+                    android:textColorHint="#FBFBFB" />
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <ListView
             android:id="@+id/idListView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
         </ListView>
+
     </LinearLayout>
+    </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
